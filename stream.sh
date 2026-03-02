@@ -20,12 +20,12 @@ STREAM_URL="${STREAM_URL:?Set STREAM_URL to the website you want to stream}"
 STREAM_KEY="${STREAM_KEY:?Set STREAM_KEY to your pump.fun stream key}"
 
 RTMP_SERVER="${RTMP_SERVER:-rtmps://pump-prod-tg2x8veh.rtmp.livekit.cloud/x}"
-RESOLUTION="${RESOLUTION:-1920x1080}"
+RESOLUTION="${RESOLUTION:-1280x720}"
 WIDTH="${RESOLUTION%x*}"
 HEIGHT="${RESOLUTION#*x}"
 FPS="${FPS:-30}"
-BITRATE="${BITRATE:-3000k}"
-AUDIO_BITRATE="${AUDIO_BITRATE:-128k}"
+BITRATE="${BITRATE:-2500k}"
+AUDIO_BITRATE="${AUDIO_BITRATE:-96k}"
 DISPLAY_NUM="${DISPLAY_NUM:-99}"
 
 cleanup() {
@@ -68,7 +68,6 @@ google-chrome \
     --no-sandbox \
     --disable-gpu \
     --disable-dev-shm-usage \
-    --disable-software-rasterizer \
     --no-first-run \
     --no-default-browser-check \
     --autoplay-policy=no-user-gesture-required \
@@ -78,6 +77,13 @@ google-chrome \
     --disable-infobars \
     --disable-session-crashed-bubble \
     --disable-translate \
+    --disable-background-timer-throttling \
+    --disable-backgrounding-occluded-windows \
+    --disable-renderer-backgrounding \
+    --disable-extensions \
+    --disable-component-update \
+    --disable-hang-monitor \
+    --js-flags="--max-old-space-size=512" \
     --user-data-dir=/tmp/chrome-stream \
     "${STREAM_URL}" &
 CHROME_PID=$!
@@ -95,12 +101,14 @@ ffmpeg \
     -f pulse \
         -i virtual_speaker.monitor \
     -c:v libx264 \
-        -preset veryfast \
+        -preset ultrafast \
         -tune zerolatency \
+        -crf 28 \
         -maxrate "${BITRATE}" \
         -bufsize "$(echo "${BITRATE}" | sed 's/k//')k" \
         -pix_fmt yuv420p \
         -g "$((FPS * 2))" \
+        -threads 0 \
     -c:a aac \
         -b:a "${AUDIO_BITRATE}" \
         -ar 44100 \

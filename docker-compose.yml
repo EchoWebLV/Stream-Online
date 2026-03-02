@@ -11,8 +11,8 @@ services:
       - STREAM_URL=${STREAM_URL:-https://hodlwarz.com}
       - STREAM_KEY=${STREAM_KEY}
       - RTMP_SERVER=${RTMP_SERVER:-rtmps://pump-prod-tg2x8veh.rtmp.livekit.cloud/x}
-      - RESOLUTION=${RESOLUTION:-1920x1080}
+      - RESOLUTION=${RESOLUTION:-1280x720}
       - FPS=${FPS:-30}
-      - BITRATE=${BITRATE:-3000k}
+      - BITRATE=${BITRATE:-2500k}
     env_file:
       - .env
