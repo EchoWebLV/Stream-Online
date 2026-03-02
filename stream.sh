@@ -20,12 +20,12 @@ STREAM_URL="${STREAM_URL:?Set STREAM_URL to the website you want to stream}"
 STREAM_KEY="${STREAM_KEY:?Set STREAM_KEY to your pump.fun stream key}"
 
 RTMP_SERVER="${RTMP_SERVER:-rtmps://pump-prod-tg2x8veh.rtmp.livekit.cloud/x}"
-RESOLUTION="${RESOLUTION:-1280x720}"
+RESOLUTION="${RESOLUTION:-960x540}"
 WIDTH="${RESOLUTION%x*}"
 HEIGHT="${RESOLUTION#*x}"
-FPS="${FPS:-30}"
-BITRATE="${BITRATE:-2500k}"
-AUDIO_BITRATE="${AUDIO_BITRATE:-96k}"
+FPS="${FPS:-24}"
+BITRATE="${BITRATE:-1500k}"
+AUDIO_BITRATE="${AUDIO_BITRATE:-64k}"
 DISPLAY_NUM="${DISPLAY_NUM:-99}"
 
 cleanup() {
@@ -108,7 +108,7 @@ ffmpeg \
         -bufsize "$(echo "${BITRATE}" | sed 's/k//')k" \
         -pix_fmt yuv420p \
         -g "$((FPS * 2))" \
-        -threads 0 \
+        -threads 1 \
     -c:a aac \
         -b:a "${AUDIO_BITRATE}" \
         -ar 44100 \
