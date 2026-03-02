@@ -31,6 +31,7 @@ DISPLAY_NUM="${DISPLAY_NUM:-99}"
 cleanup() {
     echo "[stream] Shutting down..."
     kill "$CHROME_PID" 2>/dev/null || true
+    kill "$NOVNC_PID" 2>/dev/null || true
     kill "$PULSE_PID" 2>/dev/null || true
     kill "$XVFB_PID" 2>/dev/null || true
     exit 0
@@ -50,6 +51,17 @@ PULSE_PID=$(pgrep -f "pulseaudio" | head -1) || true
 
 pactl load-module module-null-sink sink_name=virtual_speaker sink_properties=device.description=VirtualSpeaker 2>/dev/null || true
 pactl set-default-sink virtual_speaker 2>/dev/null || true
+
+VNC_PORT="${VNC_PORT:-5900}"
+NOVNC_PORT="${NOVNC_PORT:-6080}"
+
+echo "[stream] Starting VNC server on port ${VNC_PORT}"
+x11vnc -display ":${DISPLAY_NUM}" -forever -shared -nopw -rfbport "${VNC_PORT}" -bg -o /tmp/x11vnc.log 2>/dev/null
+
+echo "[stream] Starting noVNC web client on port ${NOVNC_PORT}"
+websockify --web /usr/share/novnc "${NOVNC_PORT}" localhost:"${VNC_PORT}" &
+NOVNC_PID=$!
+echo "[stream] Remote control available at http://<your-server-ip>:${NOVNC_PORT}/vnc.html"
 
 echo "[stream] Launching Chrome → ${STREAM_URL}"
 google-chrome \

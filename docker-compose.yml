@@ -5,6 +5,8 @@ services:
     build: .
     restart: always
     shm_size: "2gb"
+    ports:
+      - "6080:6080"
     environment:
       - STREAM_URL=${STREAM_URL:-https://hodlwarz.com}
       - STREAM_KEY=${STREAM_KEY}
